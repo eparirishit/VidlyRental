@@ -40,8 +40,19 @@ namespace VidlyRental.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Save(Movie movie)
         {
+            if (!ModelState.IsValid)
+            {
+                var viewModel = new MovieFormViewModel(movie)
+                {
+                    Genres = _context.Genres.ToList()
+                };
+
+                return View("MovieForm", viewModel);
+            }
+
             if (movie.Id == 0)
                 _context.Movies.Add(movie);
             else
@@ -77,9 +88,8 @@ namespace VidlyRental.Controllers
             if (movie == null)
                 HttpNotFound();
 
-            var viewModel = new MovieFormViewModel()
+            var viewModel = new MovieFormViewModel(movie)
             {
-                Movie = movie,
                 Genres = _context.Genres.ToList()
             };
 
@@ -101,6 +111,6 @@ namespace VidlyRental.Controllers
 
             };
         }
-       
+
     }
 }
